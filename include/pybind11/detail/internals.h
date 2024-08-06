@@ -447,7 +447,7 @@ inline void translate_local_exception(std::exception_ptr p) {
 
 inline object get_python_state_dict() {
     object state_dict;
-#if PYBIND11_INTERNALS_VERSION <= 4 || PY_VERSION_HEX < 0x03080000 || defined(PYPY_VERSION)
+#if PYBIND11_INTERNALS_VERSION <= 4 || defined(PYPY_VERSION)
     state_dict = reinterpret_borrow<object>(PyEval_GetBuiltins());
 #else
 #    if PY_VERSION_HEX < 0x03090000
@@ -553,7 +553,7 @@ PYBIND11_NOINLINE internals &get_internals() {
         }
 #endif
         internals_ptr->istate = tstate->interp;
-        state_dict[PYBIND11_INTERNALS_ID] = capsule(internals_pp);
+        state_dict[PYBIND11_INTERNALS_ID] = capsule(reinterpret_cast<void *>(internals_pp));
         internals_ptr->registered_exception_translators.push_front(&translate_exception);
         internals_ptr->static_property_type = make_static_property_type();
         internals_ptr->default_metaclass = make_default_metaclass();
